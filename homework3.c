@@ -10,7 +10,7 @@ int main(void)
     unsigned int count1 = 0;
 
     // TODO: Declare the variables that main uses to interact with your state machine.
-    unsigned char buttonpresshistory = UNPRESSED;
+    unsigned char buttonpreshistory = UNPRESSED;
 
 
     // Stops the Watchdog timer.
@@ -49,8 +49,8 @@ int main(void)
         // YOU MUST WRITE timer1expired IN myTimer.c
 
         if(timer1Expired())
-            buttonpresshistory = buttonpresshistory << 1;
-            buttonpresshistory = buttonpresshistory & checkStatus_BoosterpackS1();
+            buttonpreshistory = buttonpreshistory << 1;
+            buttonpreshistory = buttonpreshistory & checkStatus_BoosterpackS1();
 
 
 
@@ -59,7 +59,7 @@ int main(void)
         // TODO: Call the button state machine function to check for a completed, debounced button press.
         // YOU MUST WRITE THIS FUNCTION BELOW.
 
-            fsmBoosterpackButtonS1(buttonpresshistory);
+            fsmBoosterpackButtonS1(buttonpreshistory);
 
 
 
