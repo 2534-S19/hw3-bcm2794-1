@@ -1,4 +1,5 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
+#include <stdio.h>
 #include "homework3.h"
 #include "myGPIO.h"
 #include "myTimer.h"
@@ -38,43 +39,46 @@ int main(void)
         // YOU MUST WRITE timer0expired IN myTimer.c
 
 
-        if(timer0Expired() && (count0 < 7))
+        if(timer0Expired()){
+            if (count0 < 7)
                 count0 = count0 + 1;
-        else if(timer0Expired() && (count0 >= 7))
-            count0 = 0;
+            else
+                count0 = 0;
+        }
 
 
 
         // TODO: If Timer1 has expired, update the button history from the pushbutton value.
         // YOU MUST WRITE timer1expired IN myTimer.c
 
-        if(timer1Expired() && (checkStatus_BoosterpackS1() == 0)){
-            buttonpreshistory = buttonpreshistory << 1;
-            buttonpreshistory = buttonpreshistory & ~BIT0;
+        if (timer1Expired())
+        {
+            if (checkStatus_BoosterpackS1() == 0)
+            {
+                buttonpreshistory = PRESSED;
+            }
+            else
+            {
+                buttonpreshistory = UNPRESSED;
+            }
         }
-        else if (timer1Expired() && (checkStatus_BoosterpackS1() == 1))
-            buttonpreshistory = buttonpreshistory << 1;
-            buttonpreshistory = buttonpreshistory | BIT0;
-
-
-
-
 
         // TODO: Call the button state machine function to check for a completed, debounced button press.
         // YOU MUST WRITE THIS FUNCTION BELOW.
 
-            fsmBoosterpackButtonS1(buttonpreshistory);
-
-
 
         // TODO: If a completed, debounced button press has occurred, increment count1.
-            if ((fsmBoosterpackButtonS1(buttonpreshistory) == true) && (count1 < 7))
+        if (fsmBoosterpackButtonS1(buttonpreshistory) == true)
+        {
+            if (count1 < 7)
+            {
                 count1 = count1 + 1;
-            else if ((fsmBoosterpackButtonS1(buttonpreshistory) == true) && (count1 >= 7))
+            }
+            else
+            {
                 count1 = 0;
-
-
-
+            }
+        }
     }
 }
 
@@ -211,17 +215,27 @@ bool fsmBoosterpackButtonS1(unsigned char buttonhistory)
     switch (currentstate) {
         case up:
             if (buttonhistory == PRESSED)
+            {
                 currentstate = down;
+                //printf("%d\n", 1);
+            }
             else
+            {
                 currentstate = up;
+                //printf("%d\n", 2);
+            }
             break;
         case down:
             if (buttonhistory == UNPRESSED){
                 currentstate = up;
                 pressed = true;
+                //printf("%d\n", 3);
             }
             else
+            {
                 currentstate = down;
+                //printf("%d\n", 4);
+            }
             break;
     }
 
