@@ -48,9 +48,13 @@ int main(void)
         // TODO: If Timer1 has expired, update the button history from the pushbutton value.
         // YOU MUST WRITE timer1expired IN myTimer.c
 
-        if(timer1Expired())
+        if(timer1Expired() && (checkStatus_BoosterpackS1() == 0)){
             buttonpreshistory = buttonpreshistory << 1;
-            buttonpreshistory = buttonpreshistory & checkStatus_BoosterpackS1();
+            buttonpreshistory = buttonpreshistory & ~BIT0;
+        }
+        else if (timer1Expired() && (checkStatus_BoosterpackS1() == 1))
+            buttonpreshistory = buttonpreshistory << 1;
+            buttonpreshistory = buttonpreshistory | BIT0;
 
 
 
@@ -64,9 +68,9 @@ int main(void)
 
 
         // TODO: If a completed, debounced button press has occurred, increment count1.
-            if ((pressed = true) && (count1 < 7))
+            if ((fsmBoosterpackButtonS1(buttonpreshistory) == true) && (count1 < 7))
                 count1 = count1 + 1;
-            else if ((pressed = true) && (count1 >= 7))
+            else if ((fsmBoosterpackButtonS1(buttonpreshistory) == true) && (count1 >= 7))
                 count1 = 0;
 
 
@@ -145,51 +149,51 @@ void changeBoosterpackLED(unsigned int count)
 {
     switch (count){
        case 0:
-           turnOn_LaunchpadLED2Red();
-           turnOff_LaunchpadLED2Green();
-           turnOff_LaunchpadLED2Blue();
+           turnOn_BoosterpackLEDRed();
+           turnOff_BoosterpackLEDGreen();
+           turnOff_BoosterpackLEDBlue();
            break;
 
        case 1:
-           turnOn_LaunchpadLED2Blue();
-           turnOff_LaunchpadLED2Red();
-           turnOff_LaunchpadLED2Green();
+           turnOn_BoosterpackLEDBlue();
+           turnOff_BoosterpackLEDRed();
+           turnOff_BoosterpackLEDGreen();
            break;
 
        case 2:
-           turnOn_LaunchpadLED2Green();
-           turnOff_LaunchpadLED2Red();
-           turnOff_LaunchpadLED2Blue();
+           turnOn_BoosterpackLEDGreen();
+           turnOff_BoosterpackLEDRed();
+           turnOff_BoosterpackLEDBlue();
            break;
 
        case 3:
-           turnOn_LaunchpadLED2Red();
-           turnOn_LaunchpadLED2Blue();
-           turnOff_LaunchpadLED2Green();
+           turnOn_BoosterpackLEDRed();
+           turnOn_BoosterpackLEDBlue();
+           turnOff_BoosterpackLEDGreen();
            break;
 
        case 4:
-           turnOn_LaunchpadLED2Blue();
-           turnOn_LaunchpadLED2Green();
-           turnOff_LaunchpadLED2Red();
+           turnOn_BoosterpackLEDBlue();
+           turnOn_BoosterpackLEDGreen();
+           turnOff_BoosterpackLEDRed();
            break;
 
        case 5:
-           turnOn_LaunchpadLED2Green();
-           turnOn_LaunchpadLED2Red();
-           turnOff_LaunchpadLED2Blue();
+           turnOn_BoosterpackLEDGreen();
+           turnOn_BoosterpackLEDRed();
+           turnOff_BoosterpackLEDBlue();
            break;
 
        case 6:
-           turnOn_LaunchpadLED2Red();
-           turnOn_LaunchpadLED2Blue();
-           turnOn_LaunchpadLED2Green();
+           turnOn_BoosterpackLEDRed();
+           turnOn_BoosterpackLEDBlue();
+           turnOn_BoosterpackLEDGreen();
            break;
 
        default:
-           turnOff_LaunchpadLED2Red();
-           turnOff_LaunchpadLED2Blue();
-           turnOff_LaunchpadLED2Green();
+           turnOff_BoosterpackLEDRed();
+           turnOff_BoosterpackLEDBlue();
+           turnOff_BoosterpackLEDGreen();
            break;
        }
 }
@@ -200,10 +204,26 @@ bool fsmBoosterpackButtonS1(unsigned char buttonhistory)
 {
     bool pressed = false;
 
-    if ((buttonhistory & BIT0) = 0)
-        pressed = true;
-    else if(buttonhistory & BIT0)
-        pressed = false;
+    typedef enum {up, down} button_state;
+
+    static button_state currentstate = up;
+
+    switch (currentstate) {
+        case up:
+            if (buttonhistory == PRESSED)
+                currentstate = down;
+            else
+                currentstate = up;
+            break;
+        case down:
+            if (buttonhistory == UNPRESSED){
+                currentstate = up;
+                pressed = true;
+            }
+            else
+                currentstate = down;
+            break;
+    }
 
     return pressed;
 }
